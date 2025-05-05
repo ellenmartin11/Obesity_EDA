@@ -3,10 +3,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Load your clean dataset
+# clean dataset
 obesity_data_clean = pd.read_csv("obesity_data_clean.csv")
 
-scatter_vars = ['age', 'height', 'weight']
+scatter_vars = ['age', 'height', 'weight'] # here i'm specifying which values I want to show as options for users to make scatterplots as not all variables will make sense when plot as as scatter plot
 def plot_correlation(var1, var2):
     if var1 is None or var2 is None:
         return None
@@ -22,7 +22,7 @@ def plot_correlation(var1, var2):
     return path
 
 def plot_heatmap(cols):
-    forbidden_vars = ['gender','obesity_group','transport']
+    forbidden_vars = ['gender','obesity_group','transport'] # also excluding variables I don't want to appear in heatmap because they are non-numeric
 
     forbidden_selected = [col for col in cols if col in forbidden_vars]
     if forbidden_selected:
@@ -32,9 +32,9 @@ def plot_heatmap(cols):
     if not cols or len(cols) < 2:
         return None
 
-    corr = obesity_data_clean[cols].corr(method='spearman')
+    corr = obesity_data_clean[cols].corr(method='spearman') #computes correlation using spearman (which is better for larger observations and doesn't assume normality) - good for our ordinal, non-normal datatypes
     plt.figure(figsize=(8, 6))
-    sns.heatmap(corr, annot=True, cmap='coolwarm', vmin=-1, vmax=1)
+    sns.heatmap(corr, annot=True, cmap='coolwarm', vmin=-1, vmax=1) # annot will include the p-values, which will look a bit bad when there are lots of variables
     plt.title("Spearman Correlation Heatmap")
     plt.tight_layout()
     path = "heatmap.png"
@@ -42,7 +42,7 @@ def plot_heatmap(cols):
     plt.close()
     return path, ""
 
-numerical_variables = ['time_technology','age','height','weight','freq_veggie','amt_daily_meals','freq_snacking','amt_water','exercise_per_week','freq_alcohol']
+numerical_variables = ['time_technology','age','height','weight','freq_veggie','amt_daily_meals','freq_snacking','amt_water','exercise_per_week','freq_alcohol'] # variables appropraite for line plot
 
 
 def plot_lineplot(y_var):
@@ -78,11 +78,11 @@ def plot_lineplot(y_var):
 with gr.Blocks(theme = gr.themes.Soft()) as demo:
     gr.Markdown("# 🧪 Obesity Dataset Explorer")
 
-    with gr.Tab("Scatterplot"):
+    with gr.Tab("Scatterplot"): #this is for the tab on the web app for people to choose from 
         gr.Markdown("Explore correlation between two variables. Pick from the drop-downs below.")
-        var1 = gr.Dropdown(label="X-axis Variable", choices=scatter_vars)
+        var1 = gr.Dropdown(label="X-axis Variable", choices=scatter_vars) #dropdowns
         var2 = gr.Dropdown(label="Y-axis Variable", choices=scatter_vars)
-        scatter_btn = gr.Button("Generate Scatterplot")
+        scatter_btn = gr.Button("Generate Scatterplot") #button to generate scatterplot
         scatter_output = gr.Image()
         scatter_btn.click(fn=plot_correlation, inputs=[var1, var2], outputs=scatter_output)
 
@@ -105,3 +105,4 @@ with gr.Blocks(theme = gr.themes.Soft()) as demo:
 if __name__ == "__main__":
     demo.launch(share = True)
 
+#asked chat gpt to help with initial structuring of code using this prompt: how would I make a gradio app that let's people explore the cleaned dataset I've made and do things like make basic plots showing the correlation between variables, specify what they want to include in a correlation heatmap... etc
